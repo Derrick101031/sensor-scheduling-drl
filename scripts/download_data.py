@@ -14,8 +14,8 @@ start_time = end_time - datetime.timedelta(days=1)
 end_str = end_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 start_str = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-url = (f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json"
-       f"?api_key={READ_API_KEY}&start={start_str}&end={end_str}")
+url = f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json?api_key={READ_API_KEY}&results=100"
+
 response = requests.get(url)
 data = response.json()
 
