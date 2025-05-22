@@ -34,13 +34,13 @@ with open(csv_file, mode='a', newline='') as f:
     writer = csv.writer(f)
     if write_header:
         # Assuming the ThingSpeak fields: field1, field2, ... etc., plus a timestamp
-        headers = ["timestamp"] + [f"field{i}" for i in range(1, 9)]  # adjust number of fields
+        headers = ["timestamp"] + [f"field{i}" for i in range(1, 3)]  # adjust number of fields
         writer.writerow(headers)
     # Write each new record
     for entry in feeds:
         timestamp = entry.get("created_at")
         # Collect field values in order (ThingSpeak field1..8)
-        fields = [entry.get(f"field{i}") for i in range(1, 9)]
+        fields = [entry.get(f"field{i}") for i in range(1, 3)]
         writer.writerow([timestamp] + fields)
 
 print(f"Fetched {len(feeds)} records from ThingSpeak and appended to sensor_data.csv.")
