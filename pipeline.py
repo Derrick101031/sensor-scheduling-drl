@@ -27,7 +27,7 @@ FEATURES = ["field1", "field2", "field3"]
 TARGET_IDX = [0, 1, 2]
 
 # Load & normalize dataset
-df = pd.read_csv(DATA_PATH, parse_dates=["timestamp"])
+df = pd.read_csv(DATA_PATH, parse_dates=["created_at"])
 df = df.dropna().reset_index(drop=True)
 scaler = MinMaxScaler()
 df[FEATURES] = scaler.fit_transform(df[FEATURES])
