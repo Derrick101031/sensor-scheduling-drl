@@ -1,34 +1,46 @@
-# scripts/download_data.py
-import requests
-import datetime
-import csv
 import os
+import requests
+import csv
 
+# ThingSpeak configuration
 CHANNEL_ID = "2968337"
 READ_API_KEY = "JKW1ZRWYQDM0IEVM"
+CSV_DIR = "data"
+CSV_PATH = os.path.join(CSV_DIR, "sensor_data.csv")
 
-# Fetch last 100 entries directly
-url = f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json?api_key={READ_API_KEY}&results=100"
+# Ensure data folder exists
+os.makedirs(CSV_DIR, exist_ok=True)
+
+# URL to fetch all data from ThingSpeak in CSV format
+url = f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.csv?api_key={READ_API_KEY}"
+
+print("🔄 Fetching data from ThingSpeak...")
 response = requests.get(url)
-data = response.json()
 
-feeds = data.get("feeds", [])
-if not feeds:
-    print("No data fetched from ThingSpeak. Check API key and channel.")
-    exit()
+if response.status_code != 200:
+    print(f"❌ Failed to download data. HTTP Status Code: {response.status_code}")
+    exit(1)
 
-csv_file = "data/sensor_data.csv"
-write_header = not os.path.exists(csv_file)
+# Save response text directly to CSV
+with open(CSV_PATH, "w", newline='') as f:
+    f.write(response.text)
 
-with open(csv_file, mode='a', newline='') as f:
-    writer = csv.writer(f)
-    if write_header:
-        headers = ["timestamp"] + [f"field{i}" for i in range(1, 3)]
-        writer.writerow(headers)
-    for entry in feeds:
-        timestamp = entry.get("created_at")
-        fields = [entry.get(f"field{i}") for i in range(1, 3)]
-        writer.writerow([timestamp] + fields)
+print(f"✅ Data saved to {CSV_PATH}")
 
-print(f"Fetched {len(feeds)} records from ThingSpeak and appended to sensor_data.csv.")
+# Check if required fields are present
+print("🔍 Validating downloaded CSV...")
 
+with open(CSV_PATH, "r") as f:
+    reader = csv.reader(f)
+    header = next(reader)
+
+required_fields = ["field1", "field2", "field3"]
+missing = [field for field in required_fields if field not in header]
+
+if missing:
+    print(f"❌ Missing required fields in CSV: {', '.join(missing)}")
+    print("ℹ️  Make sure your ThingSpeak channel has field1 (moisture), field2 (temp), field3 (humidity)")
+    exit(1)
+
+print("✅ Required fields found: field1, field2, field3")
+print("📈 Ready for model training.")
