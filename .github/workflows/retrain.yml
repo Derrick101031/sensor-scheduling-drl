@@ -1,0 +1,46 @@
+name: Weekly TCN Retraining and Commit
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6:00 UTC
+  workflow_dispatch:
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tensorflow pandas matplotlib scikit-learn
+
+      - name: Fetch Sensor Data from ThingSpeak
+        run: |
+          python scripts/download_data.py
+
+      - name: Retrain TCN Model
+        run: |
+          python pipeline.py
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit New Model
+        run: |
+          git add models/tcn_model_int8.tflite
+          git commit -m "🔁 Weekly TCN model update"
+          git push
+        env:
+          # Required to allow pushes from Actions
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
