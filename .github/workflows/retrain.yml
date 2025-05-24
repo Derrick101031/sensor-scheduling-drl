@@ -36,11 +36,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit New Model
+      - name: Commit New Model and Predictions
         run: |
           git add models/tcn_model_int8.tflite
-          git commit -m "🔁 Weekly TCN model update"
+          git add models/last_predictions.csv
+          git commit -m "🔁 Weekly TCN model + predictions update"
           git push
         env:
-          # Required to allow pushes from Actions
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
