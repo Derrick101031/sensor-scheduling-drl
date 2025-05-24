@@ -7,8 +7,8 @@ import os
 CHANNEL_ID = "2968337"
 READ_API_KEY = "JKW1ZRWYQDM0IEVM"
 
-url = (f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json"
-       f"?api_key={READ_API_KEY}&start={start_str}&end={end_str}")
+# Fetch last 100 entries directly
+url = f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json?api_key={READ_API_KEY}&results=100"
 response = requests.get(url)
 data = response.json()
 
@@ -31,3 +31,4 @@ with open(csv_file, mode='a', newline='') as f:
         writer.writerow([timestamp] + fields)
 
 print(f"Fetched {len(feeds)} records from ThingSpeak and appended to sensor_data.csv.")
+
